@@ -1,72 +1,72 @@
 # Architecture Generator
 
-Tek bir **JSON DSL** dosyasından şu çıktıları üreten CLI araç:
+A CLI tool that generates the following outputs from a single **JSON DSL** file:
 
-- Java **Spring Boot** proje iskeleti (entity/repository/service/controller/DTO)
-- C# **.NET 8 Web API** proje iskeleti (EF Core DbContext + repository/service + controller + DTO)
-- PostgreSQL **migration** dosyaları (Flyway isimlendirme)
+- Java **Spring Boot** project skeleton (entity/repository/service/controller/DTO)
+- C# **.NET 8 Web API** project skeleton (EF Core DbContext + repository/service + controller + DTO)
+- PostgreSQL **migration** files (Flyway naming convention)
 - **ER diagram** (Mermaid + PlantUML)
 
-## Hızlı Başlangıç (npx)
+## Quick Start (npx)
 
 ```bash
 npx @projectfkali/arch-gen generate -i examples/ecommerce-schema.json -o ./output
 ```
 
-## Deterministik SQL migration timestamp
+## Deterministic SQL migration timestamp
 
-CI/test veya ekip içinde aynı migration isimlerini üretmek için:
+To generate the same migration names for CI/testing or team collaboration:
 
 ```bash
 arch-gen generate -i examples/ecommerce-schema.json -o ./output -t sql --timestamp 20260413171510
 ```
 
-## Kurulum
+## Installation
 
 ```bash
 npm i -g @projectfkali/arch-gen
 arch-gen --help
 ```
 
-## Demo (1 komut)
+## Demo (1 command)
 
 ```bash
 arch-gen generate -i examples/ecommerce-schema.json -o ./output -t all
 ```
 
-## 🚀 Özellikler
+## 🚀 Features
 
-- ✅ **Java Spring Boot** projesi üretimi (Entities, Repositories, Services, Controllers, DTOs)
-- ✅ **C# .NET 8 Web API** projesi üretimi (Entities, DbContext, Repositories, Services, Controllers, DTOs)
-- ✅ **PostgreSQL** migration dosyaları (Flyway format)
-- ✅ **ER Diyagramları** (Mermaid + PlantUML)
-- ✅ Tam **DSL desteği**: İlişkiler (1:1, 1:N, N:M), validasyonlar, indexler, unique constraint'ler
+- ✅ **Java Spring Boot** project generation (Entities, Repositories, Services, Controllers, DTOs)
+- ✅ **C# .NET 8 Web API** project generation (Entities, DbContext, Repositories, Services, Controllers, DTOs)
+- ✅ **PostgreSQL** migration files (Flyway format)
+- ✅ **ER Diagrams** (Mermaid + PlantUML)
+- ✅ Full **DSL support**: Relationships (1:1, 1:N, N:M), validations, indexes, unique constraints
 
-## 🎯 Kullanım
+## 🎯 Usage
 
 ### CLI
 
 ```bash
-# Tüm hedefler için
+# For all targets
 npx arch-gen generate -i schema.json -o ./output
 
-# Sadece Java için
+# Java only
 npx arch-gen generate -i schema.json -o ./output -t java
 
-# Sadece C# için
+# C# only
 npx arch-gen generate -i schema.json -o ./output -t csharp
 
-# Sadece SQL migration'lar
+# SQL migrations only
 npx arch-gen generate -i schema.json -o ./output -t sql
 
-# Sadece ER Diyagramları
+# ER Diagrams only
 npx arch-gen generate -i schema.json -o ./output -t diagram
 ```
 
-#### Parametreler
+#### Parameters
 
-- `-i, --input <file>`: DSL JSON dosyası
-- `-o, --output <dir>`: çıktı klasörü
+- `-i, --input <file>`: DSL JSON file
+- `-o, --output <dir>`: output directory
 - `-t, --target <target>`: `java|csharp|sql|diagram|all` (default: `all`)
 
 ### Programmatic API
@@ -74,22 +74,22 @@ npx arch-gen generate -i schema.json -o ./output -t diagram
 ```typescript
 import { DSLSchema, transformDSL, JavaGenerator, CSharpGenerator } from '@projectfkali/arch-gen';
 
-// DSL validasyonu
+// DSL validation
 const dsl = DSLSchema.parse(jsonData);
 
-// Domain model'e dönüştürme
+// Transform to domain model
 const model = transformDSL(dsl);
 
-// Java projesi üretimi
+// Java project generation
 const javaGen = new JavaGenerator();
 const javaFiles = javaGen.generate(model);
 
-// C# projesi üretimi
+// C# project generation
 const csharpGen = new CSharpGenerator();
 const csharpFiles = csharpGen.generate(model);
 ```
 
-## 📝 DSL Schema Formatı
+## 📝 DSL Schema Format
 
 ```json
 {
@@ -147,12 +147,12 @@ const csharpFiles = csharpGen.generate(model);
 
 ### Relationship Types
 
-- `OneToOne` - Birebir ilişki
-- `OneToMany` - Bire çok ilişki (bir ürünün birden fazla yorumu)
-- `ManyToOne` - Çoktan bire ilişki (birçok sipariş bir kullanıcıya ait)
-- `ManyToMany` - Çoktan çoğa ilişki (ürünler ve etiketler)
+- `OneToOne` - One-to-one relationship
+- `OneToMany` - One-to-many relationship (one product having multiple comments)
+- `ManyToOne` - Many-to-one relationship (many orders belonging to one user)
+- `ManyToMany` - Many-to-many relationship (products and tags)
 
-## 📁 Output Yapısı
+## 📁 Output Structure
 
 ```
 output/
@@ -186,7 +186,7 @@ output/
     └── er-diagram.puml
 ```
 
-## 🔧 Geliştirme
+## 🔧 Development
 
 ```bash
 npm install
@@ -198,17 +198,17 @@ npm test
 npm run dev -- generate -i examples/ecommerce-schema.json -o ./test-output
 ```
 
-## 📝 Örnek Projeler
+## 📝 Example Projects
 
-- `examples/ecommerce-schema.json` - E-Ticaret platformu
-- `examples/blog-schema.json` - Blog sistemi
-- `examples/saas-schema.json` - SaaS uygulaması
+- `examples/ecommerce-schema.json` - E-Commerce platform
+- `examples/blog-schema.json` - Blog system
+- `examples/saas-schema.json` - SaaS application
 
 ## Troubleshooting
 
-- **`arch-gen` bulunamadı**: global kurulumdan sonra yeni terminal aç veya `npx arch-gen ...` kullan.
-- **Validasyon hatası**: hata çıktısındaki `path` alanı, DSL içindeki sorunlu alanı gösterir.
+- **`arch-gen` not found**: Open a new terminal after global installation or use `npx arch-gen ...`.
+- **Validation error**: The `path` field in the error output indicates the problematic area within the DSL.
 
-## 📄 Lisans
+## 📄 License
 
 MIT

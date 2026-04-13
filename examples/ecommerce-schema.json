@@ -1,0 +1,116 @@
+{
+  "project": {
+    "name": "ECommerce",
+    "package": "com.ecommerce",
+    "version": "1.0.0",
+    "description": "E-Commerce platform backend",
+    "author": "ECommerce Team",
+    "database": {
+      "type": "postgresql",
+      "host": "localhost",
+      "port": 5432,
+      "database": "ecommerce_db",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  },
+  "entities": [
+    {
+      "name": "User",
+      "tableName": "users",
+      "comment": "System users",
+      "fields": [
+        { "name": "id", "type": "UUID", "primary": true, "nullable": false },
+        { "name": "email", "type": "String", "unique": true, "nullable": false, "length": 255 },
+        { "name": "password", "type": "String", "nullable": false, "length": 255 },
+        { "name": "firstName", "type": "String", "length": 100 },
+        { "name": "lastName", "type": "String", "length": 100 },
+        { "name": "isActive", "type": "Boolean", "nullable": false, "defaultValue": "true" },
+        { "name": "createdAt", "type": "DateTime", "nullable": false },
+        { "name": "updatedAt", "type": "DateTime" }
+      ],
+      "relationships": [
+        { "type": "OneToMany", "target": "Order", "mappedBy": "user", "cascade": ["ALL"] }
+      ],
+      "indexes": [
+        { "name": "idx_users_email", "fields": ["email"], "unique": true }
+      ]
+    },
+    {
+      "name": "Category",
+      "tableName": "categories",
+      "comment": "Product categories",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "name", "type": "String", "nullable": false, "length": 100 },
+        { "name": "slug", "type": "String", "unique": true, "nullable": false, "length": 100 },
+        { "name": "description", "type": "Text" }
+      ],
+      "relationships": [
+        { "type": "OneToMany", "target": "Product", "mappedBy": "category" }
+      ]
+    },
+    {
+      "name": "Product",
+      "tableName": "products",
+      "comment": "Products",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "sku", "type": "String", "unique": true, "nullable": false, "length": 50 },
+        { "name": "name", "type": "String", "nullable": false, "length": 200 },
+        { "name": "description", "type": "Text" },
+        { "name": "price", "type": "Decimal", "precision": 19, "scale": 2, "nullable": false },
+        { "name": "stockQuantity", "type": "Integer", "nullable": false, "defaultValue": "0" },
+        { "name": "isActive", "type": "Boolean", "nullable": false, "defaultValue": "true" }
+      ],
+      "relationships": [
+        { "type": "ManyToOne", "target": "Category", "joinColumn": "category_id", "nullable": false },
+        { "type": "ManyToMany", "target": "Tag", "joinTable": "product_tags" }
+      ]
+    },
+    {
+      "name": "Tag",
+      "tableName": "tags",
+      "comment": "Product tags",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "name", "type": "String", "unique": true, "nullable": false, "length": 50 }
+      ],
+      "relationships": [
+        { "type": "ManyToMany", "target": "Product", "mappedBy": "tags" }
+      ]
+    },
+    {
+      "name": "Order",
+      "tableName": "orders",
+      "comment": "Customer orders",
+      "fields": [
+        { "name": "id", "type": "UUID", "primary": true, "nullable": false },
+        { "name": "orderNumber", "type": "String", "unique": true, "nullable": false, "length": 20 },
+        { "name": "status", "type": "String", "nullable": false, "length": 20, "defaultValue": "'PENDING'" },
+        { "name": "totalAmount", "type": "Decimal", "precision": 19, "scale": 2, "nullable": false },
+        { "name": "orderDate", "type": "DateTime", "nullable": false },
+        { "name": "shippingAddress", "type": "JSON" }
+      ],
+      "relationships": [
+        { "type": "ManyToOne", "target": "User", "joinColumn": "user_id", "nullable": false },
+        { "type": "OneToMany", "target": "OrderItem", "mappedBy": "order", "cascade": ["ALL"], "orphanRemoval": true }
+      ]
+    },
+    {
+      "name": "OrderItem",
+      "tableName": "order_items",
+      "comment": "Order line items",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "quantity", "type": "Integer", "nullable": false },
+        { "name": "unitPrice", "type": "Decimal", "precision": 19, "scale": 2, "nullable": false },
+        { "name": "subtotal", "type": "Decimal", "precision": 19, "scale": 2, "nullable": false }
+      ],
+      "relationships": [
+        { "type": "ManyToOne", "target": "Order", "joinColumn": "order_id", "nullable": false },
+        { "type": "ManyToOne", "target": "Product", "joinColumn": "product_id", "nullable": false }
+      ]
+    }
+  ]
+}

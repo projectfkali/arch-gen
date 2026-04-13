@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.env
+.env.local
+coverage/
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+output/
+final-output/
+ts-out/
+ts-out2/
+gui-test.zip

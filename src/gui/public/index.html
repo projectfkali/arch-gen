@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Architecture Generator - GUI</title>
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.12);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.66);
+        --accent: #7c3aed;
+        --danger: #ef4444;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        color: var(--text);
+        background: radial-gradient(1200px 600px at 20% 0%, rgba(124,58,237,0.35), transparent 60%),
+                    radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,0.20), transparent 55%),
+                    var(--bg);
+      }
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 18px 40px; }
+      .top {
+        display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;
+        margin-bottom: 18px;
+      }
+      h1 { margin: 0; font-size: 20px; letter-spacing: 0.2px; }
+      .sub { margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.35; }
+      .card {
+        background: linear-gradient(180deg, rgba(255,255,255,0.075), rgba(255,255,255,0.05));
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: 0 16px 60px rgba(0,0,0,0.35);
+      }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+      .panel { padding: 14px; }
+      label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+      textarea {
+        width: 100%;
+        min-height: 420px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0,0,0,0.25);
+        color: var(--text);
+        padding: 12px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        line-height: 1.45;
+        outline: none;
+      }
+      textarea:focus { border-color: rgba(124,58,237,0.55); box-shadow: 0 0 0 4px rgba(124,58,237,0.15); }
+      select, input[type="file"] {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0,0,0,0.25);
+        color: var(--text);
+        padding: 10px 12px;
+        outline: none;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .btns { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-weight: 650;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(180deg, rgba(124,58,237,1), rgba(99,102,241,1));
+        box-shadow: 0 10px 30px rgba(124,58,237,0.25);
+      }
+      button.secondary {
+        background: rgba(255,255,255,0.10);
+        box-shadow: none;
+      }
+      button:disabled { opacity: 0.6; cursor: not-allowed; }
+      .status {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(0,0,0,0.22);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+      .status.error { border-color: rgba(239,68,68,0.5); color: rgba(255,255,255,0.86); }
+      .pill {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.07);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      a { color: rgba(167,139,250,0.95); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <div>
+          <h1>Architecture Generator — GUI</h1>
+          <div class="sub">
+            JSON DSL’i buraya yapıştırın veya dosya seçin. Ardından target seçip ZIP olarak indir.
+          </div>
+        </div>
+        <div class="pill">
+          <span>API:</span>
+          <a href="/health" target="_blank" rel="noreferrer">/health</a>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="card panel">
+          <div class="row">
+            <div>
+              <label>Target</label>
+              <select id="target">
+                <option value="all">all</option>
+                <option value="java">java</option>
+                <option value="csharp">csharp</option>
+                <option value="sql">sql</option>
+                <option value="diagram">diagram</option>
+              </select>
+            </div>
+            <div>
+              <label>DSL JSON dosyası</label>
+              <input id="file" type="file" accept="application/json,.json" />
+            </div>
+          </div>
+
+          <label>DSL JSON</label>
+          <textarea id="dsl" spellcheck="false"></textarea>
+
+          <div class="btns">
+            <button id="generate">Generate & Download ZIP</button>
+            <button id="loadExample" class="secondary" title="examples/ecommerce-schema.json'i yükler">Load Example</button>
+            <button id="clear" class="secondary">Clear</button>
+          </div>
+
+          <div id="status" class="status">Hazır.</div>
+        </div>
+
+        <div class="card panel">
+          <div style="font-weight:650; margin-bottom:8px;">İpuçları</div>
+          <div class="sub" style="margin-top:0">
+            - Bu arayüz, aynı repodaki generator’ları kullanır ve çıktılarını ZIP olarak döner.<br/>
+            - Validasyon hataları varsa burada listelenir.<br/>
+            - Örnek schema: <code>examples/ecommerce-schema.json</code><br/>
+          </div>
+          <div style="height:10px"></div>
+          <div style="font-weight:650; margin-bottom:8px;">Kısa kullanım</div>
+          <div class="sub" style="margin-top:0">
+            1) <b>Load Example</b> ile örnek yükle<br/>
+            2) Target seç<br/>
+            3) <b>Generate</b> → ZIP indir<br/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const statusEl = $("status");
+      const dslEl = $("dsl");
+      const targetEl = $("target");
+      const fileEl = $("file");
+      const genBtn = $("generate");
+
+      function setStatus(text, isError = false) {
+        statusEl.textContent = text;
+        statusEl.classList.toggle("error", !!isError);
+      }
+
+      fileEl.addEventListener("change", async () => {
+        const f = fileEl.files && fileEl.files[0];
+        if (!f) return;
+        const text = await f.text();
+        dslEl.value = text;
+        setStatus(`Dosya yüklendi: ${f.name}`);
+      });
+
+      $("clear").addEventListener("click", () => {
+        dslEl.value = "";
+        fileEl.value = "";
+        setStatus("Temizlendi.");
+      });
+
+      $("loadExample").addEventListener("click", async () => {
+        try {
+          setStatus("Örnek yükleniyor...");
+          const resp = await fetch("/__example/ecommerce");
+          if (!resp.ok) throw new Error("Örnek yüklenemedi.");
+          const txt = await resp.text();
+          dslEl.value = txt;
+          setStatus("Örnek yüklendi: examples/ecommerce-schema.json");
+        } catch (e) {
+          setStatus(String(e && e.message ? e.message : e), true);
+        }
+      });
+
+      genBtn.addEventListener("click", async () => {
+        try {
+          const raw = dslEl.value.trim();
+          if (!raw) {
+            setStatus("DSL JSON boş. Dosya seçin veya yapıştırın.", true);
+            return;
+          }
+
+          let parsed;
+          try { parsed = JSON.parse(raw); }
+          catch (e) {
+            setStatus("JSON parse hatası: " + (e && e.message ? e.message : e), true);
+            return;
+          }
+
+          genBtn.disabled = true;
+          setStatus("Generate ediliyor... (ZIP hazırlanıyor)");
+
+          const resp = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ target: targetEl.value, dsl: parsed })
+          });
+
+          if (!resp.ok) {
+            let bodyText = await resp.text();
+            try {
+              const obj = JSON.parse(bodyText);
+              if (obj && obj.details && Array.isArray(obj.details)) {
+                const details = obj.details.map(d => `- ${d.path}: ${d.message}`).join("\n");
+                setStatus((obj.error || "Hata") + "\n" + details, true);
+                return;
+              }
+              setStatus(obj.error || bodyText, true);
+              return;
+            } catch {
+              setStatus(bodyText || "Bilinmeyen hata", true);
+              return;
+            }
+          }
+
+          const blob = await resp.blob();
+          const cd = resp.headers.get("content-disposition") || "";
+          const match = cd.match(/filename="([^"]+)"/);
+          const filename = match ? match[1] : "output.zip";
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+
+          setStatus("Tamamlandı. ZIP indirildi: " + filename);
+        } catch (e) {
+          setStatus("Hata: " + String(e && e.message ? e.message : e), true);
+        } finally {
+          genBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
+

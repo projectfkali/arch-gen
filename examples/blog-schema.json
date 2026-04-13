@@ -1,0 +1,53 @@
+{
+  "project": {
+    "name": "Blog",
+    "package": "com.blog",
+    "version": "1.0.0",
+    "description": "Simple blog platform"
+  },
+  "entities": [
+    {
+      "name": "User",
+      "fields": [
+        { "name": "id", "type": "UUID", "primary": true, "nullable": false },
+        { "name": "username", "type": "String", "unique": true, "nullable": false, "length": 50 },
+        { "name": "email", "type": "String", "unique": true, "nullable": false, "length": 255 },
+        { "name": "password", "type": "String", "nullable": false, "length": 255 }
+      ],
+      "relationships": [
+        { "type": "OneToMany", "target": "Post", "mappedBy": "author" },
+        { "type": "OneToMany", "target": "Comment", "mappedBy": "author" }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "Post",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "title", "type": "String", "nullable": false, "length": 200 },
+        { "name": "slug", "type": "String", "unique": true, "nullable": false, "length": 200 },
+        { "name": "content", "type": "Text" },
+        { "name": "published", "type": "Boolean", "nullable": false, "defaultValue": "false" },
+        { "name": "createdAt", "type": "DateTime", "nullable": false }
+      ],
+      "relationships": [
+        { "type": "ManyToOne", "target": "User", "joinColumn": "author_id", "nullable": false },
+        { "type": "OneToMany", "target": "Comment", "mappedBy": "post", "cascade": ["ALL"] }
+      ],
+      "indexes": []
+    },
+    {
+      "name": "Comment",
+      "fields": [
+        { "name": "id", "type": "Long", "primary": true, "autoIncrement": true, "nullable": false },
+        { "name": "content", "type": "Text", "nullable": false },
+        { "name": "createdAt", "type": "DateTime", "nullable": false }
+      ],
+      "relationships": [
+        { "type": "ManyToOne", "target": "Post", "joinColumn": "post_id", "nullable": false },
+        { "type": "ManyToOne", "target": "User", "joinColumn": "author_id", "nullable": false }
+      ],
+      "indexes": []
+    }
+  ]
+}
